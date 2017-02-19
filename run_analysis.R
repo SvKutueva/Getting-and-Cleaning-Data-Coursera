@@ -19,8 +19,8 @@ SubjectTrainData <- read.table(file.path(path_rf, "train", "subject_train.txt"),
 SubjectTestData  <- read.table(file.path(path_rf, "test" , "subject_test.txt"), header = FALSE)
 FeaturesTestData  <- read.table(file.path(path_rf, "test" , "X_test.txt" ), header = FALSE)
 FeaturesTrainData <- read.table(file.path(path_rf, "train", "X_train.txt"), header = FALSE)
-activity_labels <- read.table(file.path(path_rf, "activity_labels.txt")
-features <- read.table(file.path(path_rf, "features.txt")
+activity_labels <- read.table(file.path(path_rf, "activity_labels.txt"))
+features <- read.table(file.path(path_rf, "features.txt"))
                        
 # Merging data:
                                
@@ -38,6 +38,22 @@ names(FeaturesData) <- features$V2
 dataCombine <- cbind(SubjectData, ActivityData)
 AllData <- cbind(FeaturesData, dataCombine)
 
+# replace activity values with named factor levels:
+AllData$activity <- factor(AllData$activity, levels = activity_labels[, 1], labels = activity_labels[, 2])
+
+
+# Using descriptive variable names:
+names(AllData) <-gsub("^t", "time", names(AllData))
+names(AllData) <-gsub("^f", "frequency", names(AllData))
+names(AllData) <-gsub("Acc", "Accelerometer", names(AllData))
+names(AllData) <-gsub("Gyro", "Gyroscope", names(AllData))
+names(AllData) <-gsub("Mag", "Magnitude", nameDatas(AllData))
+names(AllData) <-gsub("BodyBody", "Body", names(AllData))
+
+# check:
+
+names(AllData)
+
 # Extracting only the measurements on the mean and standard deviation for each measurement:
         
 subsetFeatures <- features$V2[grep("mean\\(\\)|std\\(\\)", features$V2)]
@@ -46,7 +62,7 @@ subsetData <- subset(AllData, select = selectedNames)
 
 # Creating tidy data:
         
-library(plyr)
-Data2 <- aggregate(. ~ subject + activity, subsetData, mean)
-Data2 <- Data2[order(Data2$subject,Data2$activity), ]
-write.table(Data2, file = "tidydata.txt",row.name=FALSE)
+library(dplyr)
+tidyData <- aggregate(. ~ subject + activity, AllData, mean)
+tidyData <- tidyData[order(tidyData$subject, tidyData$activity), ]
+write.table(tidyData, file = "tidydata.txt",row.name = FALSE)
