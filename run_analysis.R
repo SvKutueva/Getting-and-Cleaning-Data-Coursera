@@ -6,8 +6,8 @@ download.file(fileUrl, destfile = "./data/Dataset.zip", method = "curl")
 
 #Unzip files and set working directory.
 
-unzip(zipfile = "./data1/Dataset1.zip", exdir = "./data1")
-path_rf <- file.path("./data1" , "UCI HAR Dataset")
+unzip(zipfile = "./data/Dataset.zip", exdir = "./data")
+path_rf <- file.path("./data" , "UCI HAR Dataset")
 files <- list.files(path_rf, recursive=TRUE)
 files
 
